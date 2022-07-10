@@ -12,13 +12,11 @@ type mysqldb struct {
 	dbConn *sql.DB
 }
 
-func NewMySqlDb(user, password, dbname string) *mysqldb {
-	db, err := sql.Open("mysql", user+":"+password+"@/"+dbname)
+func NewMySqlDb(user, password, url, dbname string) *mysqldb {
+	db, err := sql.Open("mysql", user+":"+password+"@tcp("+url+":3306)/"+dbname)
 	if err != nil {
 		panic(err)
 	}
-
-	verifyDbInit(db)
 
 	return &mysqldb{
 		dbConn: db,
@@ -71,12 +69,4 @@ func (db *mysqldb) GetAll() ([]domain.User, error) {
 	}
 
 	return users, nil
-}
-
-func verifyDbInit(db *sql.DB) {
-	result, err := db.Query("CREATE TABLE IF NOT EXISTS users (id INT PRIMARY KEY, name VARCHAR(255) NOT NULL)")
-	if err != nil {
-		panic(err.Error())
-	}
-	defer result.Close()
 }

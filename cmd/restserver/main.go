@@ -13,7 +13,8 @@ const DefaultCertPath = "./misc/server.crt"
 const DefaultPvtKeyPath = "./misc/server.key"
 
 func main() {
-	usersRepository := repositories.NewMySqlDb("tech-user", "tech-pw", "users-db")
+	usersRepository := repositories.NewMySqlDb(
+		getEnv("DB_USER", "tech-user"), getEnv("DB_PASS", "tech-pw"), getEnv("DB_HOST", "localhost"), getEnv("DB_NAME", "usersdb"))
 	usersService := services.New(usersRepository)
 	usersHandler := handlers.New(usersService)
 
@@ -27,7 +28,7 @@ func main() {
 
 func getEnv(key, fallback string) string {
 	if value, ok := os.LookupEnv(key); ok {
-			return value
+		return value
 	}
 	return fallback
 }

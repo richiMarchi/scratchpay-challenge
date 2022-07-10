@@ -1,0 +1,11 @@
+CREATE DATABASE IF NOT EXISTS usersdb;
+CREATE TABLE IF NOT EXISTS usersdb.users (
+id INT PRIMARY KEY,
+name VARCHAR(255) NOT NULL
+);
+LOAD DATA INFILE '/docker-entrypoint-initdb.d/init_data/data.csv'
+INTO TABLE users
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n' 
+IGNORE 1 LINES
+(id,name);

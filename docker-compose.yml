@@ -1,0 +1,45 @@
+version: '3.9'
+services:
+  app:
+    build: .
+    image: richimarchi/users-api:latest
+    container_name: app
+    ports:
+      - 8080:8080
+    depends_on:
+      - database
+    restart: always
+    environment:
+      - CERT_PATH=/misc/server.crt
+      - PVTKEY_PATH=/misc/server.key
+      - DB_HOST=database
+      - DB_USER=tech-user
+      - DB_PASS=tech-pw
+      - DB_NAME=usersdb
+    links:
+      - "database"
+    volumes:
+      - ./misc/server.crt:/misc/server.crt
+      - ./misc/server.key:/misc/server.key
+
+  database:
+    image: mysql
+    container_name: mysql-db
+    restart: always
+    command: --secure-file-priv=docker-entrypoint-initdb.d
+    volumes:
+      - mysql_volume:/var/lib/mysql
+      - ./misc/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./misc/data.csv:/docker-entrypoint-initdb.d/init_data/data.csv
+    ports:
+      - 3306:3306
+    expose:
+      - 3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root-pw
+      - MYSQL_DATABASE=usersdb
+      - MYSQL_USER=tech-user
+      - MYSQL_PASSWORD=tech-pw
+
+volumes:
+    mysql_volume:
