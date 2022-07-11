@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: scratchpay
+  name: mysql-db
+  labels:
+    app: mysql-db
+spec:
+  selector:
+    matchLabels:
+      app: mysql-db
+  template:
+    metadata:
+      labels:
+        app: mysql-db
+    spec:
+      containers:
+        - name: mysql-db
+          image: mysql
+          args: 
+            - "--secure-file-priv=docker-entrypoint-initdb.d"
+          ports:
+          - containerPort: 3306
+          resources:
+            requests:
+              cpu: 150m
+              memory: 300Mi
+            limits:
+              cpu: 300m
+              memory: 600Mi
+          volumeMounts:
+            - mountPath: /docker-entrypoint-initdb.d/init.sql
+              name: db-init
+              subPath: sql.init
+            - mountPath: /docker-entrypoint-initdb.d/init_data/data.csv
+              name: db-init
+              subPath: data.csv
+            - mountPath: /var/lib/mysql
+              name: database
+          envFrom:
+            - secretRef:
+                name: db-secret
+          securityContext:
+            allowPrivilegeEscalation: false
+      volumes:
+        - name: db-init
+          configMap:
+            name: mysql-files
+        - name: database
+          persistentVolumeClaim:
+            claimName: database-storage

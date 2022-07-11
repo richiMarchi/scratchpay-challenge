@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: scratchpay
+  name: users-api
+  labels:
+    app: users-api
+spec:
+  selector:
+    matchLabels:
+      app: users-api
+  template:
+    metadata:
+      labels:
+        app: users-api
+    spec:
+      containers:
+        - name: users-api
+          image: richimarchi/users-api:v0.1.0
+          ports:
+          - containerPort: 8080
+          resources:
+            requests:
+              cpu: 50m
+              memory: 100Mi
+            limits:
+              cpu: 100m
+              memory: 200Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+          envFrom:
+            - secretRef:
+                name: app-secret
+          env:
+            - name: CERT_PATH
+              value: "/misc/server.crt"
+            - name: PVTKEY_PATH
+              value: "/misc/server.key"
+            - name: DB_HOST
+              value: "db-service.scratchpay.svc.cluster.local"
+          volumeMounts:
+            - mountPath: /misc/server.crt
+              name: certificate
+              subPath: tls.crt
+            - mountPath: /misc/server.key
+              name: certificate
+              subPath: tls.key
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+        fsGroup: 2000
+      volumes:
+        - name: certificate
+          secret:
+            secretName: app-certificate
