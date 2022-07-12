@@ -17,6 +17,29 @@ spec:
       containers:
         - name: users-api
           image: richimarchi/users-api:v0.1.0
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTPS
+            periodSeconds: 5
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTPS
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+          startupProbe:
+            exec:
+              command:
+                - "/bin/sh"
+                - "-c"
+                - "nc -w2 db-service.scratchpay.svc.cluster.local 3306"
+            failureThreshold: 3
+            periodSeconds: 10
           ports:
           - containerPort: 8080
           resources:

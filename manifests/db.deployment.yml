@@ -6,6 +6,8 @@ metadata:
   labels:
     app: mysql-db
 spec:
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: mysql-db
@@ -16,11 +18,17 @@ spec:
     spec:
       containers:
         - name: mysql-db
-          image: mysql
+          image: mysql:8.0.29
           args: 
             - "--secure-file-priv=docker-entrypoint-initdb.d"
           ports:
           - containerPort: 3306
+          livenessProbe:
+            tcpSocket:
+              port: 3306
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
           resources:
             requests:
               cpu: 150m

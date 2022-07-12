@@ -22,6 +22,11 @@ func main() {
 	router.GET("/users/:userId", usersHandler.GetUser)
 	router.POST("/users", usersHandler.CreateUser)
 	router.GET("/users", usersHandler.ListUsers)
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status": "UP",
+		})
+	})
 
 	router.RunTLS(":8080", getEnv("CERT_PATH", DefaultCertPath), getEnv("PVTKEY_PATH", DefaultPvtKeyPath))
 }
