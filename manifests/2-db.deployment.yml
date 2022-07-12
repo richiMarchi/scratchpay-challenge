@@ -23,6 +23,11 @@ spec:
             - "--secure-file-priv=docker-entrypoint-initdb.d"
           ports:
           - containerPort: 3306
+          readinessProbe:
+            tcpSocket:
+              port: 3306
+            periodSeconds: 5
+            timeoutSeconds: 5
           livenessProbe:
             tcpSocket:
               port: 3306

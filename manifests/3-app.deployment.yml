@@ -37,9 +37,10 @@ spec:
               command:
                 - "/bin/sh"
                 - "-c"
-                - "nc -w2 db-service.scratchpay.svc.cluster.local 3306"
-            failureThreshold: 3
-            periodSeconds: 10
+                - "nc -w3 db-service.scratchpay.svc.cluster.local 3306"
+            failureThreshold: 5
+            periodSeconds: 15
+            timeoutSeconds: 5
           ports:
           - containerPort: 8080
           resources:
