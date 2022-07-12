@@ -1,0 +1,58 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: users-api-np
+spec:
+  podSelector:
+    matchLabels:
+      app: users-api
+  policyTypes:
+  - Egress
+  - Ingress
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: ingress-nginx
+      ports:
+        - port: 8080
+          protocol: TCP
+  egress:
+    - ports:
+      - port: 53
+        protocol: UDP
+      - port: 53
+        protocol: TCP
+    - to:
+      - podSelector:
+          matchLabels:
+            app: mysql-db
+      ports:
+        - port: 3306
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mysql-db-np
+spec:
+  podSelector:
+    matchLabels:
+      app: mysql-db
+  policyTypes:
+  - Egress
+  - Ingress
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            app: users-api
+      ports:
+        - port: 3306
+          protocol: TCP
+  egress:
+    - ports:
+      - port: 53
+        protocol: UDP
+      - port: 53
+        protocol: TCP

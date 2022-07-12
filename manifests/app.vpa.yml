@@ -1,0 +1,12 @@
+apiVersion: autoscaling.k8s.io/v1beta1
+kind: VerticalPodAutoscaler
+metadata:
+  namespace: scratchpay
+  name: users-api-vpa
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind:       Deployment
+    name:       users-api
+  updatePolicy:
+    updateMode: "Off"
